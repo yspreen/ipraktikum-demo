@@ -91,7 +91,7 @@ async function dialogflow(req, res) {
   }
 
   response = JSON.parse(r);
-  response.sessionId = req.session.id;
+  // response.sessionId = req.session.id;
   res.json(response);
 }
 
