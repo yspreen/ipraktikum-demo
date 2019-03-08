@@ -7,7 +7,8 @@ const fs = require('fs');
 var https = require('https');
 // var querystring = require('querystring');
 var session = require('express-session');
-const uuidv4 = require('uuid/v4');
+var uuid = require('node-uuid');
+
 
 async function doRequest(text, jwt, session) {
   const postData = JSON.stringify({
@@ -90,7 +91,7 @@ async function dialogflow(req, res) {
   }
 
   response = JSON.parse(r);
-  // response.sessionId = req.session.id;
+  response.sessionId = req.session.id;
   res.json(response);
 }
 
@@ -98,7 +99,7 @@ express()
   .set('trust proxy', 1) // trust first proxy
   .use(session({
     genid: function (req) {
-      return uuidv4() // use UUIDs for session IDs
+      return uuid.v4() // use UUIDs for session IDs
     },
     secret: 'keyboard catz',
     resave: false,
