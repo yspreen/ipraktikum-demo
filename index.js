@@ -6,9 +6,10 @@ const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
 var https = require('https');
 // var querystring = require('querystring');
+var session = require('express-session');
+const uuidv4 = require('uuid/v4');
 
-
-async function doRequest(text, jwt) {
+async function doRequest(text, jwt, session) {
   const postData = JSON.stringify({
     "queryInput": {
       "text": {
@@ -19,7 +20,6 @@ async function doRequest(text, jwt) {
   });
 
   const project = 'ipraktikum-demo';
-  const session = 'test';
 
   const options = {
     hostname: 'content-dialogflow.googleapis.com',
@@ -84,16 +84,30 @@ async function dialogflow(req, res) {
 
   let query = req.body.query || ' ';
   try {
-    r = await doRequest(query, jwt);
+    r = await doRequest(query, jwt, req.session.id);
   } catch (error) {
     // console.error(error)
   }
 
-  response.data = r;
-  res.json(JSON.parse(r));
+  response = JSON.parse(r);
+  // response.sessionId = req.session.id;
+  res.json(response);
 }
 
 express()
+  .set('trust proxy', 1) // trust first proxy
+  .use(session({
+    genid: function (req) {
+      return uuidv4() // use UUIDs for session IDs
+    },
+    secret: 'keyboard catz',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000
+    }
+  }))
   .use(express.json())
   .get('/dialogflow', dialogflow)
   .post('/dialogflow', dialogflow)
