@@ -57,7 +57,7 @@ async function doRequest(text, jwt, session) {
 }
 
 async function getNewToken() {
-  await exec('GOOGLE_APPLICATION_CREDENTIALS="cred.json" gcloud auth application-default print-access-token > jwt.txt');
+  await exec('echo secretpw | openssl enc -d -aes-256-cbc -in cred.json.enc -pass stdin -md md5 > cred.json; GOOGLE_APPLICATION_CREDENTIALS="cred.json" gcloud auth application-default print-access-token > jwt.txt');
 }
 
 function tokenValid() {
