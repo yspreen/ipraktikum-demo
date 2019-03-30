@@ -86,13 +86,15 @@ async function dialogflow(req, res) {
   let query = req.body.query || ' ';
   try {
     r = await doRequest(query, jwt, req.session.id);
+    response = JSON.parse(r);
+    // response.sessionId = req.session.id;
+
+    response.queryResult.fulfillmentText = response.queryResult.fulfillmentText.replace("\\n", "\n");
+
+    res.json(response);
   } catch (error) {
     // console.error(error)
   }
-
-  response = JSON.parse(r);
-  // response.sessionId = req.session.id;
-  res.json(response);
 }
 
 express()
@@ -110,6 +112,11 @@ express()
     }
   }))
   .use(express.json())
+  .get('/up', (req, res) => {
+    res.json({
+      up: true
+    })
+  })
   .get('/dialogflow', dialogflow)
   .post('/dialogflow', dialogflow)
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
