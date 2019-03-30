@@ -89,7 +89,7 @@ async function dialogflow(req, res) {
     response = JSON.parse(r);
     // response.sessionId = req.session.id;
 
-    response.queryResult.fulfillmentText = response.queryResult.fulfillmentText.replace("\\n", "\n");
+    response.queryResult.fulfillmentText = response.queryResult.fulfillmentText.replace(/\\n/g, "\n");
 
     res.json(response);
   } catch (error) {
